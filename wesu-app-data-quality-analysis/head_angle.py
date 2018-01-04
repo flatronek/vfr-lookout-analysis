@@ -9,7 +9,7 @@ def plotZAxis2(dataFrame1, dataFrame2, label1="DF1", label2="DF2"):
     x2 = dataFrame2[file_header_real_time]
     values2 = dataFrame2[file_header_Z_dps]
 
-    title = "Glider Turnings"
+    title = "Head gyroscope data"
 
     fig, ax = plt.subplots()
     fig.canvas.set_window_title(title)
@@ -67,7 +67,7 @@ def run():
     z_cum_int = integrate.cumtrapz(z, t / 1000, initial=0)
     fig, ax = plt.subplots()
     fig.set_size_inches(24.4, 6)
-    plt.title("Cumulative trapez integration")
+    plt.title("Cumulative trapeze integration")
     # ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
     plt.grid()
     plt.plot(t, z_cum_int, marker='.', linestyle='--')
