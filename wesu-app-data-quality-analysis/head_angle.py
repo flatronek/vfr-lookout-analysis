@@ -2,7 +2,7 @@ from vfr_data_analysis.realTimeDataAnalysis import *
 from vfr_data_analysis.samples import *
 
 
-def plotZAxis2(dataFrame1, dataFrame2, label1 = "DF1", label2 = "DF2"):
+def plotZAxis2(dataFrame1, dataFrame2, label1="DF1", label2="DF2"):
     x1 = dataFrame1[file_header_real_time]
     values1 = dataFrame1[file_header_Z_dps]
 
@@ -38,20 +38,31 @@ def run():
     # correctData = head_gyr_orient_quaternion_data.df[head_gyr_orient_quaternion_data.df[file_header_hostTimestamp] > 530000]
 
     # data in between 17:07:05 - 17:07:15 - 1 full head turn
-    correctData = head_gyr_orient_quaternion_data.df[(head_gyr_orient_quaternion_data.df[file_header_hostTimestamp] > 550000) & (head_gyr_orient_quaternion_data.df[file_header_hostTimestamp] < 568000)]
+    correctData = head_gyr_orient_quaternion_data.df[
+        (head_gyr_orient_quaternion_data.df[file_header_hostTimestamp] > 550000) &
+        (head_gyr_orient_quaternion_data.df[file_header_hostTimestamp] < 580000)]
+    # correctData = dataInTime[(dataInTime[file_header_Z_dps] > 20) | (dataInTime[file_header_Z_dps] < -20)]
     print("All data size: %d, correct data size: %d" % (len(head_gyr_orient_quaternion_data.df.index), len(correctData.index)))
 
-    interpolatedData = interpolate_data(Data(head_gyr_orient_quaternion_data.device, head_gyr_orient_quaternion_data.category, correctData), 10)
+    interpolatedData = interpolate_data(
+        Data(head_gyr_orient_quaternion_data.device, head_gyr_orient_quaternion_data.category, correctData), 10)
     # interpolatedData = Data(head_gyr_orient_quaternion_data.device, head_gyr_orient_quaternion_data.category, correctData)
+    # interpolatedData.df = interpolatedData.df.insert(0, file_header_Z_dps, interpolatedData.df[file_header_Z_dps])
     plotZAxis2(correctData, interpolatedData.df, "Non interpolated", "Interpolated")
 
-    zDps = np.array(interpolatedData.df[file_header_Z_dps])
+    zDps = interpolatedData.df[file_header_Z_dps]
+    negSum = sum(zDps[zDps < 0])
+    posSum = sum(zDps[zDps >= 0])
+    offset = ((posSum + negSum) / len(zDps))
+    zDps = zDps - offset
+
     print(zDps)
-    print("Negative zDPS sum: %d" % sum(zDps[zDps < 0]))
-    print("Non negative zDPS sum: %d" % sum(zDps[zDps >= 0]))
+    print("Negative zDPS sum: %d" % negSum)
+    print("Non negative zDPS sum: %d" % posSum)
+    print("Offset: %f" % offset)
 
 
-    z = interpolatedData.df[file_header_Z_dps]
+    z = zDps
     t = interpolatedData.df[file_header_hostTimestamp]
     z_cum_int = integrate.cumtrapz(z, t / 1000, initial=0)
     fig, ax = plt.subplots()
