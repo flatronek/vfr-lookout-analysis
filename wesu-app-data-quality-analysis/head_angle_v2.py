@@ -5,6 +5,9 @@ from vfr_data_analysis.samples import *
 head_neutral_acc_vector = pd.np.array([-1000, -125, 170])
 glider_neutral_acc_vector = pd.np.array([-200, -54, 970])
 
+head_gyro_calibration_vector = pd.np.array([0.4, -0.9, -1.6])
+glider_gyro_calibration_vector = pd.np.array([1.6, -3.6, -3.3])
+
 
 def plotZAxis(dataFrame1, title = "Gyroscope data"):
     x1 = dataFrame1[file_header_real_time]
@@ -50,33 +53,51 @@ def plotZAxis2(dataFrame1, dataFrame2, label1="DF1", label2="DF2"):
     plt.show()
 
 
-def prepareGliderGyroData(deviceId, neutralAccVector, startTimestamp, endTimestamp):
+def prepareGliderGyroData(deviceId, neutralAccVector, axisCalibrationVector, startTimestamp, endTimestamp):
     reorientVector = qt_from_two_vectors(neutralAccVector, z_axis_vector)
+
     loadedGyrData = load_data_of(deviceId, cat_gyroscope)
-    orientGyrData = orientate_data_using_quaternion(loadedGyrData, reorientVector)
+
+    calibratedGyrData = calibrateDataAxis(loadedGyrData, axisCalibrationVector)
+
+    orientGyrData = orientate_data_using_quaternion(calibratedGyrData, reorientVector)
 
     df = orientGyrData.df
     timeCutDf = df[(df[file_header_hostTimestamp] > startTimestamp) & (df[file_header_hostTimestamp] < endTimestamp)]
 
-    interpolatedData = interpolate_data(Data(orientGyrData.device, orientGyrData.category, timeCutDf), 50)
+    interpolatedData = interpolate_data(Data(orientGyrData.device, orientGyrData.category, timeCutDf), 50, startTimestamp, endTimestamp)
+
+    print("Interpolated data start: \n")
+    print(interpolatedData.df.iloc[0])
 
     return interpolatedData
 
 
+def calibrateDataAxis(data, calibrationVector):
+    result = copy.deepcopy(data)
+
+    result.df[result.df.columns[5]] = result.df[result.df.columns[5]] - calibrationVector[0]
+    result.df[result.df.columns[6]] = result.df[result.df.columns[6]] - calibrationVector[1]
+    result.df[result.df.columns[7]] = result.df[result.df.columns[7]] - calibrationVector[2]
+
+    return result
+
+
 def cumulateAndPlotData(gliderData, headData):
-    time = gliderData.df[file_header_hostTimestamp]
+    gliderTime = gliderData.df[file_header_hostTimestamp]
+    headTime = headData.df[file_header_hostTimestamp]
 
     headZAxis = headData.df[file_header_Z_dps]
     gliderZAxix = gliderData.df[file_header_Z_dps]
 
-    headIntegratedData = integrate.cumtrapz(headZAxis, time / 1000, initial=0)
-    gliderIntegratedData = integrate.cumtrapz(gliderZAxix, time / 1000, initial=0)
+    headIntegratedData = integrate.cumtrapz(headZAxis, headTime / 1000, initial=0)
+    gliderIntegratedData = integrate.cumtrapz(gliderZAxix, gliderTime / 1000, initial=0)
 
     fig, ax = plt.subplots()
     fig.set_size_inches(24.4, 6)
 
-    plt.plot(time, headIntegratedData, marker='.', linestyle='--')
-    plt.plot(time, gliderIntegratedData, marker='.', linestyle='--')
+    plt.plot(headTime, headIntegratedData, marker='.', linestyle='--')
+    plt.plot(gliderTime, gliderIntegratedData, marker='.', linestyle='--')
 
     plt.title("Cumulative trapeze integration")
     # ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
@@ -87,10 +108,10 @@ def cumulateAndPlotData(gliderData, headData):
 
 def run():
     startTime = 550000
-    endTime = 1000000
+    endTime = 580000
 
-    gliderInterpolatedData = prepareGliderGyroData(dev_glider, glider_neutral_acc_vector, startTime, endTime)
-    headInterpolatedData = prepareGliderGyroData(dev_head, head_neutral_acc_vector, startTime, endTime)
+    gliderInterpolatedData = prepareGliderGyroData(dev_glider, glider_neutral_acc_vector, glider_gyro_calibration_vector, startTime, endTime)
+    headInterpolatedData = prepareGliderGyroData(dev_head, head_neutral_acc_vector, head_gyro_calibration_vector, startTime, endTime)
     plotZAxis(gliderInterpolatedData.df, "Head gyro data")
 
     cumulateAndPlotData(gliderInterpolatedData, headInterpolatedData)
