@@ -79,12 +79,9 @@ def interpolate_data(data, interpolation_step, start_ts=0, end_ts=None):
     :param end_ts: end of window to cut out from all Data object
     :return: 
     """
-    end_ts = end_ts if end_ts is not None \
-        else data.df[file_header_hostTimestamp].iloc[-1]
-    cut_df = data.df[data.df[file_header_hostTimestamp].between(start_ts, end_ts)]
-    cut_df = cut_df.sort_values(file_header_hostTimestamp)
+    cut_df = data.df.sort_values(file_header_hostTimestamp)
     old_t = cut_df[file_header_hostTimestamp]
-    new_t = range(old_t.iloc[0], old_t.iloc[-1], interpolation_step)
+    new_t = range(start_ts, end_ts, interpolation_step)
     values_labels = cut_df.columns[5:]
     new_df = pd.DataFrame()
     for vl in values_labels:
