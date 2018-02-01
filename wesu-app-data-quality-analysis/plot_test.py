@@ -18,3 +18,15 @@ if __name__ == "__main__":
 # kam na glowe
 # start realTime - 2017-05-09_17:05:27
 # start sensorTime - 451000
+
+
+
+#2018-05-09
+# start realTime - 2017-05-10_18:21:40
+# start sensorTime - 860000
+# glider acc vector - [240, 20, 1000]
+
+# kam na glowe
+# start realTime - 2017-05-10_18:23:51
+# start sensorTime - 860000
+# head acc vector - [-850, 500, 0]

@@ -1,13 +1,19 @@
 from vfr_data_analysis.realTimeDataAnalysis import *
 from vfr_data_analysis.samples import *
 
-
+# 2017-05-17
 head_neutral_acc_vector = pd.np.array([-1000, -125, 170])
 glider_neutral_acc_vector = pd.np.array([-200, -54, 970])
 
 head_gyro_calibration_vector = pd.np.array([0.4, -0.9, -1.6])
 glider_gyro_calibration_vector = pd.np.array([1.6, -3.6, -3.3])
 
+# 2017-05-18
+# head_neutral_acc_vector = pd.np.array([-850, 500, 0])
+# glider_neutral_acc_vector = pd.np.array([240, 20, 1000])
+#
+# head_gyro_calibration_vector = pd.np.array([0.5, -1.3, -1.1])
+# glider_gyro_calibration_vector = pd.np.array([0.3, -3.5, -2.7])
 
 def plotZAxis(dataFrame1, title = "Gyroscope data"):
     x1 = dataFrame1[file_header_real_time]
@@ -102,15 +108,20 @@ def cumulateAndPlotData(gliderData, headData):
     headZAxis = headData.df[file_header_Z_dps]
     gliderZAxix = gliderData.df[file_header_Z_dps]
 
-    headIntegratedData = integrate.cumtrapz(headZAxis, headTime / 1000, initial=0)
-    gliderIntegratedData = integrate.cumtrapz(gliderZAxix, gliderTime / 1000, initial=0)
+    headIntegratedData = integrate.cumtrapz(headZAxis, headTime, initial=0) / 1000
+    gliderIntegratedData = integrate.cumtrapz(gliderZAxix, gliderTime, initial=0) / 1000
+
+    print("Result")
+    print((headZAxis - gliderZAxix)[0:100])
+
+    resultData = integrate.cumtrapz(headZAxis - gliderZAxix, headTime, initial=0) / 1000
 
     fig, ax = plt.subplots()
     fig.set_size_inches(24.4, 6)
 
     plt.plot(headTime, headIntegratedData, marker='.', linestyle='--')
     plt.plot(gliderTime, gliderIntegratedData, marker='.', linestyle='--')
-    plt.plot(headTime, headIntegratedData - gliderIntegratedData, marker='.', linestyle='--')
+    plt.plot(headTime, resultData, marker='.', linestyle='--')
 
     plt.title("Cumulative trapeze integration")
     # ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
