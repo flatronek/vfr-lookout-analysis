@@ -1,14 +1,12 @@
 import argparse
 import datetime
-import numpy as np
-import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-import sympy
 import os
 import re
 import sys
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 #constatns
 file_header_nodename = "NodeName"

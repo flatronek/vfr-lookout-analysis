@@ -80,7 +80,7 @@ def plot3(igcDf, regDf):
 
     ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
     plt.grid()
-    plt.legend(igcDf.columns[9])
+    plt.legend(["IGC", "Mag"])
     plt.show()
 
 
