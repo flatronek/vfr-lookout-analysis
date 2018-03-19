@@ -16,8 +16,8 @@ glider_gyro_calibration_vector = pd.np.array([1.6, -3.6, -3.3])
 # glider_gyro_calibration_vector = pd.np.array([0.3, -3.5, -2.7])
 
 # peak detection params
-lag = 30
-threshold = 5
+lag = 20
+angleThreshold = 20
 influence = 0.05
 
 
@@ -129,35 +129,6 @@ def getHeadRelativeAngle(headData, gliderData):
     return result
 
 
-def cumulateAndPlotData(gliderData, headData):
-    gliderTime = gliderData.df[file_header_hostTimestamp]
-    headTime = headData.df[file_header_hostTimestamp]
-
-    headZAxis = headData.df[file_header_Z_dps]
-    gliderZAxix = gliderData.df[file_header_Z_dps]
-
-    headIntegratedData = integrate.cumtrapz(headZAxis, headTime, initial=0) / 1000
-    gliderIntegratedData = integrate.cumtrapz(gliderZAxix, gliderTime, initial=0) / 1000
-
-    print("Result")
-    print((headZAxis - gliderZAxix)[0:100])
-
-    resultData = integrate.cumtrapz(headZAxis - gliderZAxix, headTime, initial=0) / 1000
-
-    fig, ax = plt.subplots()
-    fig.set_size_inches(24.4, 6)
-
-    plt.plot(headTime, headIntegratedData, marker='.', linestyle='--')
-    plt.plot(gliderTime, gliderIntegratedData, marker='.', linestyle='--')
-    plt.plot(headTime, resultData, marker='.', linestyle='--')
-
-    plt.title("Cumulative trapeze integration")
-    # ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
-    plt.grid()
-    plt.legend(["Head data", "Glider data", "Result"])
-    plt.show()
-
-
 def filterAndCumulateData(headData):
     headTime = headData.df[file_header_hostTimestamp]
     headZAxis = headData.df[file_header_Z_dps]
@@ -183,7 +154,7 @@ def detectPeaks(headData):
 
     for i in range(lag, zData.size):
         # print("It: %d, val: %f, avgFilter: %f, stdDev: %f" % (i, zData.iloc[i], avgFilter[i - 1], stdFilter[i - 1]))
-        if np.absolute(zData.iloc[i] - avgFilter[i - 1]) > (threshold * stdFilter[i - 1]):
+        if np.absolute(zData.iloc[i] - avgFilter[i - 1]) > angleThreshold:
             if zData.iloc[i] > avgFilter[i - 1]:
                 turnings[i] = 100
             else:
@@ -235,25 +206,10 @@ def plotResult2(originalHeadData, peaksData):
     fig, ax = plt.subplots()
     fig.set_size_inches(24.4, 6)
 
-    upperStd = peaksData.df[file_header_Y_dps] + threshold * peaksData.df[file_header_X_dps]
-    lowerStd = peaksData.df[file_header_Y_dps] - threshold * peaksData.df[file_header_X_dps]
-
-    print("Avg")
-    print(peaksData.df[file_header_Y_dps].iloc[30:40])
-
-    print("Std")
-    print(peaksData.df[file_header_X_dps].iloc[30:40])
-
-    print("Combined")
-    print(upperStd.iloc[30:40])
-
     # cumulatedData
     plt.plot(originalHeadData.df[file_header_real_time], originalHeadData.df[file_header_Z_dps], marker='.', linestyle='--')
     # moving average
     plt.plot(peaksData.df[file_header_real_time], peaksData.df[file_header_Y_dps], marker='.', linestyle='--')
-    # std threshold
-    plt.plot(peaksData.df[file_header_real_time], lowerStd, marker='.', linestyle='-')
-    plt.plot(peaksData.df[file_header_real_time], upperStd, marker='.', linestyle='-')
     # detected peak
     plt.plot(peaksData.df[file_header_real_time], peaksData.df[file_header_Z_dps], marker='.', linestyle='-')
 
@@ -266,7 +222,7 @@ def plotResult2(originalHeadData, peaksData):
 
 def run():
     startTime = 550000
-    endTime = 800000
+    endTime = 1400000
 
     headTimeCutData = prepareGliderGyroData(dev_head, head_neutral_acc_vector, head_gyro_calibration_vector,
                                             startTime, endTime)
