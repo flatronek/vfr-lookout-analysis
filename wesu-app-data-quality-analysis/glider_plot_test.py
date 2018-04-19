@@ -9,8 +9,7 @@ igcHeaderTimestamp = "timestamp"
 vidTimeHeader = "VidTime"
 
 igcSyncTimestamp = "2017-05-09 09:14:00"
-vidSyncTimestamp = "2017-05-09 17:07:37"
-vidSync1Timestamp = "2017-05-09 17:08:51"
+vidSyncTimestamp = "2017-05-09 17:09:51"
 
 
 # "2017-05-17 11:11:22 CEST"
@@ -35,7 +34,7 @@ def plot(dataFrame):
 
     ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
     plt.grid()
-    plt.legend(dataFrame.columns[2])
+    plt.legend(["Turning"])
     plt.show()
 
 
@@ -114,8 +113,6 @@ def loadAndPlotBoth():
     timeDiff = vidTime - igcTime
 
     print(timeDiff)
-
-    filename_to_find = "igc_turnings.csv"
 
     igcDf = loadData("igc_turnings.csv", igcHeaderTimestamp)
     regDf = loadData("glider_turnings.csv", file_header_real_time)

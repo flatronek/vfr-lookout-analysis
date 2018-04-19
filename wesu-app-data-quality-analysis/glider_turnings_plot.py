@@ -22,5 +22,5 @@ if __name__ == "__main__":
 
     plotData(glider_mag_data, "Wskazania magnetometru z czujnika umieszczonego na szybowcu")
     plotData(glider_mag_no_spikes_data, "Wskazania magnetometru z czujnika umieszczonego na szybowcu, po usunięciu szumu")
-    plotData(glider_turnings, "Wykryte skręty szybowca, rezultat przefiltrowany medianowo")
+    plotData(glider_turnings, "Wykryte skręty szybowca")
     export_glider_turnings_to_csv(glider_turnings)

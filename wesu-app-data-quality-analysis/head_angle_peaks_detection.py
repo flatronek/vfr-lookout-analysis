@@ -172,9 +172,6 @@ def detectPeaks(headData):
     result.df[file_header_Y_dps] = avgFilter
     result.df[file_header_Z_dps] = turnings
 
-    print("Result peaks")
-    print(result.df.iloc[25:40])
-
     return result
 
 
@@ -209,20 +206,20 @@ def plotResult2(originalHeadData, peaksData):
     # cumulatedData
     plt.plot(originalHeadData.df[file_header_real_time], originalHeadData.df[file_header_Z_dps], marker='.', linestyle='--')
     # moving average
-    plt.plot(peaksData.df[file_header_real_time], peaksData.df[file_header_Y_dps], marker='.', linestyle='--')
+    plt.plot(peaksData.df[file_header_real_time], peaksData.df[file_header_Y_dps], marker='.', linestyle='-')
     # detected peak
     plt.plot(peaksData.df[file_header_real_time], peaksData.df[file_header_Z_dps], marker='.', linestyle='-')
 
     plt.title("Cumulative trapeze integration")
     ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%H:%M:%S"))
     plt.grid()
-    plt.legend(["Head data", "Average", "Lower std", "Upper std", "Peaks"])
+    plt.legend(["Head data", "Average", "Peaks"])
     plt.show()
 
 
 def run():
     startTime = 550000
-    endTime = 1400000
+    endTime = 1700000
 
     headTimeCutData = prepareGliderGyroData(dev_head, head_neutral_acc_vector, head_gyro_calibration_vector,
                                             startTime, endTime)
