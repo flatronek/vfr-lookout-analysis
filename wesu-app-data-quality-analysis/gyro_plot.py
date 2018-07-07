@@ -36,8 +36,8 @@ def prepare_gyro_data_orientated(deviceId, neutralAccVector, startTimestamp, end
 
 
 def run():
-    startTime = 550000
-    endTime = 800000
+    startTime = 0
+    endTime = 3000000
 
     head_acc_data = prepareGliderGyroData(dev_head, head_neutral_acc_vector, head_gyro_calibration_vector,
                                           startTime, endTime)

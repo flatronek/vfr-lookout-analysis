@@ -51,9 +51,9 @@ def prepare_accelerometer_data_orientated(deviceId, neutralAccVector, startTimes
 
 def run():
     startTime = 0
-    endTime = 800000
+    endTime = 3000000
 
-    head_acc_data = prepare_accelerometer_data_orientated(dev_head, head_neutral_acc_vector, startTime, endTime)
+    head_acc_data = prepare_accelerometer_data_orientated(dev_glider, head_neutral_acc_vector, startTime, endTime)
     # head_acc_data = prepare_accelerometer_data(dev_head, startTime, endTime)
     plot(head_acc_data)
 
