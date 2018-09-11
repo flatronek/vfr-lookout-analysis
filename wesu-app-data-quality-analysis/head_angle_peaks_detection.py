@@ -1,23 +1,23 @@
 from vfr_data_analysis.realTimeDataAnalysis import *
 from vfr_data_analysis.samples import *
 
-# 2017-05-17
-head_neutral_acc_vector = pd.np.array([-1000, -125, 170])
-glider_neutral_acc_vector = pd.np.array([-200, -54, 970])
-
-head_gyro_calibration_vector = pd.np.array([0.4, -0.9, -1.6])
-glider_gyro_calibration_vector = pd.np.array([1.6, -3.6, -3.3])
+# # 2017-05-17
+# head_neutral_acc_vector = pd.np.array([-1000, -125, 170])
+# glider_neutral_acc_vector = pd.np.array([-200, -54, 970])
+#
+# head_gyro_calibration_vector = pd.np.array([0.4, -0.9, -1.6])
+# glider_gyro_calibration_vector = pd.np.array([1.6, -3.6, -3.3])
 
 # 2017-05-18
-# head_neutral_acc_vector = pd.np.array([-850, 500, 0])
-# glider_neutral_acc_vector = pd.np.array([240, 20, 1000])
-#
-# head_gyro_calibration_vector = pd.np.array([0.5, -1.3, -1.1])
-# glider_gyro_calibration_vector = pd.np.array([0.3, -3.5, -2.7])
+head_neutral_acc_vector = pd.np.array([-860, 490, 20])
+glider_neutral_acc_vector = pd.np.array([240, 20, 1000])
+
+head_gyro_calibration_vector = pd.np.array([0.5, -1.3, -1.1])
+glider_gyro_calibration_vector = pd.np.array([0.3, -3.5, -2.7])
 
 # peak detection params
 lag = 20
-angleThreshold = 20
+angleThreshold = 25
 influence = 0.05
 
 
@@ -70,9 +70,9 @@ def prepareGliderGyroData(deviceId, neutralAccVector, axisCalibrationVector, sta
 
     loadedGyrData = load_data_of(deviceId, cat_gyroscope)
 
-    # calibratedGyrData = calibrateDataAxis(loadedGyrData, axisCalibrationVector)
+    calibratedGyrData = calibrateDataAxis(loadedGyrData, axisCalibrationVector)
 
-    orientGyrData = orientate_data_using_quaternion(loadedGyrData, reorientVector)
+    orientGyrData = orientate_data_using_quaternion(calibratedGyrData, reorientVector)
 
     df = orientGyrData.df
     timeCutDf = df[(df[file_header_hostTimestamp] > startTimestamp) & (df[file_header_hostTimestamp] < endTimestamp)]

@@ -6,7 +6,7 @@ from vfr_data_analysis.samples import *
 glider_neutral_acc_vector = pd.np.array([-200, -54, 970])
 
 # 2017-05-18
-head_neutral_acc_vector = pd.np.array([-825, 556, 90])
+head_neutral_acc_vector = pd.np.array([-875, 462, 82])
 
 def plot(data):
     plotData(data, title="Head accelerometer data (orientated)")
@@ -43,7 +43,7 @@ def prepare_accelerometer_data_orientated(deviceId, neutralAccVector, startTimes
     reorientVector = qt_from_two_vectors(neutralAccVector, z_axis_vector)
     orientGyrData = orientate_data_using_quaternion(accData, reorientVector)
 
-    df = orientGyrData.df
+    df = orientGyrData
     timeCutDf = df[(df[file_header_hostTimestamp] > startTimestamp) & (df[file_header_hostTimestamp] < endTimestamp)]
 
     return Data(accData.device, accData.category, timeCutDf)
@@ -53,8 +53,8 @@ def run():
     startTime = 0
     endTime = 3000000
 
-    head_acc_data = prepare_accelerometer_data_orientated(dev_glider, head_neutral_acc_vector, startTime, endTime)
-    # head_acc_data = prepare_accelerometer_data(dev_head, startTime, endTime)
+    # head_acc_data = prepare_accelerometer_data_orientated(dev_head, head_neutral_acc_vector, startTime, endTime)
+    head_acc_data = prepare_accelerometer_data(dev_head, startTime, endTime)
     plot(head_acc_data)
 
 
